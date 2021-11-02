@@ -57,7 +57,7 @@ class PostView(View):
                 'post_id'     : post.id,
                 'user'        : post.user.name,
                 'title'       : post.title,
-                "created_at"  : post.created_at,
+                "created_at"  : post.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 } for post in posts]
             return JsonResponse({'count': len(posts), 'data':data}, status=200)
 
@@ -69,15 +69,21 @@ class PostDetailView(View):
         try:
             
             post = Post.objects.get(id=post_id)
-            #TODO: 조회수 증가
+
             data = {
                     'post_id'    : post.id,
                     'user'       : post.user.name,
                     'title'      : post.title,
                     'content'    : post.content,
                     'hits'       : post.hits,
-                    "created_at" : post.created_at,
+                    "created_at" : post.created_at.strftime('%Y-%m-%d %H:%M:%S')
                 }
+            user = request.session.get('user', None)
+            
+            if not user:
+                post.hits +=1
+                post.save()
+            
             return JsonResponse({'data': data}, status=200)
 
         except Post.DoesNotExist:
@@ -160,7 +166,7 @@ class CommentView(View):
             comment_list = [{
                 'user_name'     : comment.user.name,
                 'comment'       : comment.comment,
-                'created_at'    : comment.created_at,
+                'created_at'    : comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
             } for comment in comments]
             
             return JsonResponse({'DATA' : comment_list}, status = 200)
@@ -255,7 +261,7 @@ class DetailCommentView(View):
         detail_comments_list = [{
             'user_name'      : comment.user.name,
             'detail_comment' : comment.detail_comment,
-            'created_at'     : comment.created_at,
+            'created_at'     : comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
         }for comment in DetailComment.objects.filter(comment_id = comment_id)]
         
         return JsonResponse({'detail_comments_list' : detail_comments_list }, status = 200)
