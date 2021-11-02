@@ -1,11 +1,13 @@
 from django.urls import path
 
-from posts.views import (PostView,
+from posts.views import (
+    PostView,
     PostDetailView, 
     CommentView, 
     CommentModifyView, 
     DetailCommentView, 
-    DetailCommentModifyView)
+    DetailCommentModifyView
+)
 
 urlpatterns = [
     path('', PostView.as_view()),

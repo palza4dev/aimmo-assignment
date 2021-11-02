@@ -10,6 +10,7 @@ class Post(models.Model):
     content    = models.TextField()
     category   = models.ForeignKey(Category, on_delete=models.CASCADE)
     user       = models.ForeignKey(User, on_delete=models.CASCADE)
+    hits       = models.PositiveIntegerField(default=0,verbose_name='조회수')
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=False)
 
