@@ -78,9 +78,9 @@ DATABASES = {
        'default': {
            'ENGINE': 'djongo',
            'NAME': 'aimmo',
-        #    'CLIENT': {
-        #        'host': 'mongodb://aimmo:mM011363!!@localhost:27017/?authSource=aimmo&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
-        #    }
+           'CLIENT': {
+               'host': 'mongodb://aimmo:mM011363!!@localhost:27017/?authSource=aimmo&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
+           }
        }
    }
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
