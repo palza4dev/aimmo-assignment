@@ -18,6 +18,7 @@ class Post(models.Model):
         
 class Comment(models.Model):
     comment    = models.CharField(max_length=500)
+    user       = models.ForeignKey(User, on_delete=models.CASCADE)
     post       = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=False, auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=False)
