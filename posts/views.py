@@ -1,12 +1,13 @@
 import json
-from json.decoder import JSONDecodeError
+from json.decoder     import JSONDecodeError
+from datetime         import date, datetime, timedelta
 
-from django.http  import JsonResponse
-from django.views import View
-from django.db    import transaction
+from django.http      import JsonResponse
+from django.views     import View
+from django.db.models import Q
 
-from posts.models import Category, Post, Comment, DetailComment
-from users.utils  import login_decorator
+from posts.models     import Post, Comment, DetailComment
+from users.utils      import login_decorator
 
 class PostView(View):
     @login_decorator
@@ -33,24 +34,32 @@ class PostView(View):
     
     def get(self, request):
         try:
-            limit  = int(request.GET.get('limit', 10))
-            offset = int(request.GET.get('offset', 0))
-            #TODO: 카테고리 필터링
-            #TODO: 검색
+            category = request.GET.get('category', None)
+            keyword  = request.GET.get('keyword', None)
+            limit    = int(request.GET.get('limit', 100))
+            offset   = int(request.GET.get('offset', 0))
 
-            if limit > 10:
+            q=Q()
+            
+            if category:
+                q &= Q(category__id = category)
+                
+            if keyword:
+                q &= (Q(title__icontains=keyword)|Q(content__icontains=keyword))
+
+
+            if limit > 100:
                 return JsonResponse({'message':'TOO_MUCH_LIMIT'}, status=400)
 
-            posts  = Post.objects.all()[offset:offset+limit]
+            posts  = Post.objects.filter(q)[offset:offset+limit]
 
-            result = [{
-                'post_id'    : post.id,
-                'user'       : post.user.name,
-                'title'      : post.title,
-                "created_at" : post.created_at,
-                "updated_at" : post.updated_at
+            data = [{
+                'post_id'     : post.id,
+                'user'        : post.user.name,
+                'title'       : post.title,
+                "created_at"  : post.created_at,
                 } for post in posts]
-            return JsonResponse({'count': len(posts), 'data':result}, status=200)
+            return JsonResponse({'count': len(posts), 'data':data}, status=200)
 
         except ValueError:
             return JsonResponse({'message':'VALUE_ERROR'}, status=400)
@@ -58,6 +67,7 @@ class PostView(View):
 class PostDetailView(View):
     def get(self, request, post_id):
         try:
+            
             post = Post.objects.get(id=post_id)
             #TODO: 조회수 증가
             data = {
@@ -65,8 +75,8 @@ class PostDetailView(View):
                     'user'       : post.user.name,
                     'title'      : post.title,
                     'content'    : post.content,
+                    'hits'       : post.hits,
                     "created_at" : post.created_at,
-                    "updated_at" : post.updated_at
                 }
             return JsonResponse({'data': data}, status=200)
 
@@ -74,7 +84,6 @@ class PostDetailView(View):
             return JsonResponse({'message' : 'POST_NOT_FOUND'}, status=404)
 
     @login_decorator
-    @transaction.atomic
     def patch(self, request, post_id):
         try:
             data    = json.loads(request.body)
@@ -115,7 +124,7 @@ class CommentView(View):
     def post(self, request, post_id):
         try:
             if not Post.objects.filter(id = post_id).exists() :
-                return JsonResponse({'message' : 'INVALID_PRODUCT_ID'}, status = 404)
+                return JsonResponse({'message' : 'INVALID_POST_ID'}, status = 404)
 
             data   = json.loads(request.body)
             user   = request.user

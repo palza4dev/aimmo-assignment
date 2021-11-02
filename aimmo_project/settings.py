@@ -78,26 +78,9 @@ DATABASES = {
        'default': {
            'ENGINE': 'djongo',
            'NAME': 'aimmo',
-           'CLIENT': {
-               'host': 'mongodb://aimmo:mM011363!!@localhost:27017/?authSource=aimmo&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'
-           }
+           'CLIENT': {'host' : os.environ['HOST']}   
        }
-   }
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# MONGODB_DATABASES = {
-#     'default': {
-#         'name': os.environ['DB_NAME'],
-#         'host': os.environ['DB_HOST'],
-#         'password': os.environ['DB_PASSWORD'],
-#         'username': os.environ['DB_USER']
-#     }
-# }
-#SESSION_ENGINE = 'mongoengine.django.sessions'
-
-#mongoengine.connect(host='mongodb://aimmo:mM011363!!@localhost:27017/?authSource=aimmo&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false')
-
-#mongoengine.connect(db='aimmo', host='127.0.0.1', username='aimmo', password='mM011363!!', authentication_source='admin')
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
